@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">BestYoutubeApp</string>
+    <string-array name="Categories">
+        <item>Humor</item>
+        <item>Chill</item>
+        <item>Tutorial</item>
+        <item>Gaming</item>
+        <item>Cooking</item>
+        <item>SMR</item>
+    </string-array>
+</resources>

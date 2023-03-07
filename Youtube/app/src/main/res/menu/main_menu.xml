@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/AddVideo"
+        android:title="Add"
+        app:showAsAction="never"
+        />
+
+    <!--TODO Remove-->
+    <item
+        android:id="@+id/ShowDetails"
+        android:title="Details"
+        app:showAsAction="never"
+        />
+</menu>

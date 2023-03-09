@@ -104,7 +104,7 @@ public class AddYoutubeVideoActivity extends AppCompatActivity {
 
     public boolean handleErrorToast(String txt) {
         String toast_txt = " ";
-        if (txt == null){
+        if (txt == null || txt.length() <= 1){
             toast_txt = "well some fields are mandatory";
             showToast(toast_txt);
             return false;

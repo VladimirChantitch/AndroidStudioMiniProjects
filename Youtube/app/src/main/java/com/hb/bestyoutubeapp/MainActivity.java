@@ -1,16 +1,24 @@
 package com.hb.bestyoutubeapp;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 
 import com.hb.bestyoutubeapp.adapter.VideoAdapter;
 import com.hb.bestyoutubeapp.dao.Video_DAO;
@@ -22,6 +30,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView rv_Video;
+    private List<CardView> cardViews = new ArrayList<>();
+    private VideoAdapter videoAdapter = null;
+    private int numberOfVideos = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +49,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        LoadRecyclerViewFromDB();
+    }
+
+    private void LoadRecyclerViewFromDB() {
 
         rv_Video = findViewById(R.id.rv_Video);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -98,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         protected List<Video> doInBackground(String... strings) {
             Video_DAO video_dao = new Video_DAO(getApplicationContext());
             List<Video> videos = new ArrayList<>();
+            numberOfVideos = videos.size();
 
             try{
                 videos = video_dao.findAll_Video();
@@ -110,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<Video> videos) {
-            VideoAdapter videoAdapter = new VideoAdapter(videos);
+            videoAdapter = new VideoAdapter(videos, getApplicationContext());
             rv_Video.setAdapter(videoAdapter);
         }
     }

@@ -104,4 +104,13 @@ public class Video_DAO extends DAO{
 
         close();
     }
+
+    public void remove_VideoById(long id) {
+        open();
+
+        db.delete(DB_Helper.VIDEO_TABLE_NAME, DB_Helper.VIDEO_KEY + " = ? ",
+                new String[]{String.valueOf(id)});
+
+        close();
+    }
 }

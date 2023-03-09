@@ -3,6 +3,8 @@ package com.hb.bestyoutubeapp.adapter;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.DisplayMetrics;
@@ -18,6 +20,8 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hb.bestyoutubeapp.R;
+import com.hb.bestyoutubeapp.custom_ui.MyCardView;
+import com.hb.bestyoutubeapp.dao.Video_DAO;
 import com.hb.bestyoutubeapp.pojo.Video;
 
 import java.util.ArrayList;
@@ -26,7 +30,7 @@ import java.util.List;
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHolder> {
 
     private List<Video> videos;
-    private List<CardView> cardViews = new ArrayList<>();
+    private List<MyCardView> cardViews = new ArrayList<>();
     Context context = null;
     int numberofVideos = 0;
     public class VideoViewHolder extends RecyclerView.ViewHolder{
@@ -40,7 +44,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
             tv_description = itemView.findViewById(R.id.tv_Description);
             tv_category = itemView.findViewById(R.id.tv_Category);
             if (itemView instanceof CardView) {
-                cardViews.add(((CardView) itemView));
+                cardViews.add(((MyCardView) itemView));
             }
             if (numberofVideos >= cardViews.size()){
                 SetUpEventsOnCardViews();
@@ -75,36 +79,57 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
         return videos.size();
     }
 
-    public List<CardView> getCards(){
+    public List<MyCardView> getCards(){
         return cardViews;
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+
     private void SetUpEventsOnCardViews() {
         for (int i = 0; i < cardViews.size(); i++) {
-            CardView cardView = cardViews.get(i);
-            cardView.setOnTouchListener((view, event) -> {
-                        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-                        int cardWidth = cardView.getWidth();
-                        float cardStart = ((float)metrics.widthPixels / 2) - cardWidth / 2;
-                        switch (event.getAction()) {
-                            case MotionEvent.ACTION_MOVE:
-                                float newX = event.getRawX();
-                                // Swipe left
-                                if (newX - cardWidth < cardStart){
-                                    cardView.animate()
-                                            .x(min(cardStart, newX - (cardWidth/2)))
-                                            .setDuration(0)
-                                            .start();
-                                }
-                                break;
-                            case MotionEvent.ACTION_UP:
-                                // TODO: Handle ACTION_UP
-                                break;
-                        }
-                        return true;
-                    }
-            );
+            MyCardView myCardView = cardViews.get(i);
+            myCardView.setVideoId(videos.get(i).getId());
+
+            setUpTouchEvent(myCardView);
         }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void setUpTouchEvent(MyCardView myCardView){
+        myCardView.setOnTouchListener((view, event) -> {
+                    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+                    int cardWidth = myCardView.getWidth();
+                    float cardStart = ((float)metrics.widthPixels / 2) - cardWidth / 2;
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_MOVE:
+                            float newX = event.getRawX();
+                            // Swipe left
+                            if (newX - cardWidth < cardStart){
+                                myCardView.animate()
+                                        .x(min(cardStart, newX - (cardWidth/2)))
+                                        .setDuration(0)
+                                        .start();
+                            }
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            myCardView.animate()
+                                    .alpha(0)
+                                    .setDuration(150)
+                                    .setListener(
+                                            new AnimatorListenerAdapter() {
+                                                @Override
+                                                public void onAnimationEnd(Animator animation) {
+                                                    super.onAnimationEnd(animation);
+
+                                                    Video_DAO video_dao = new Video_DAO(context);
+                                                    video_dao.remove_VideoById(myCardView.getVideoId());
+                                                }
+                                            }
+                                    )
+                                    .start();
+                            break;
+                    }
+                    return true;
+                }
+        );
     }
 }
